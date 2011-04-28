@@ -50,7 +50,7 @@ module Jammit
                   :embed_assets, :package_assets, :compress_assets, :gzip_assets,
                   :package_path, :mhtml_enabled, :include_jst_script, :config_path,
                   :javascript_compressor, :compressor_options, :css_compressor_options,
-                  :template_extension, :template_extension_matcher, :allow_debugging
+                  :template_extension, :template_extension_matcher, :allow_debugging, :haml, :use_i18n
     attr_accessor :compressors
   end
 

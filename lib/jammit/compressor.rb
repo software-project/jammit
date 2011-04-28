@@ -1,3 +1,4 @@
+require "haml"
 module Jammit
 
   # Uses the YUI Compressor or Closure Compiler to compress JavaScript.
@@ -99,10 +100,7 @@ module Jammit
       paths       = paths.grep(Jammit.template_extension_matcher).sort
       base_path   = find_base_path(paths)
       compiled    = paths.map do |path|
-        contents  = read_binary_file(path)
-        contents  = contents.gsub(/\r?\n/, "\\n").gsub("'", '\\\\\'')
-        name      = template_name(path, base_path)
-        "#{namespace}['#{name}'] = #{Jammit.template_function}('#{contents}');"
+        process_template namespace, path, base_path
       end
       compiler = Jammit.include_jst_script ? read_binary_file(DEFAULT_JST_SCRIPT) : '';
       setup_namespace = "#{namespace} = #{namespace} || {};"
@@ -111,6 +109,19 @@ module Jammit
 
 
     private
+
+    def process_template(namespace, path, base_path)
+      if Jammit.haml
+        engine = Haml::Engine.new(path, Jammit.haml)
+        name      = template_name(path, base_path)
+        "#{namespace}['#{name}'] = #{Jammit.template_function}('#{engine.render}');"
+      else
+        contents  = read_binary_file(path)
+        contents  = contents.gsub(/\r?\n/, "\\n").gsub("'", '\\\\\'')
+        name      = template_name(path, base_path)
+        "#{namespace}['#{name}'] = #{Jammit.template_function}('#{contents}');"
+      end
+    end
 
     # Given a set of paths, find a common prefix path.
     def find_base_path(paths)
