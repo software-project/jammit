@@ -81,7 +81,9 @@ module Jammit
     @mhtml_enabled          = @embed_assets && @embed_assets != "datauri"
     @compressor_options     = symbolize_keys(conf[:compressor_options] || {})
     @css_compressor_options = symbolize_keys(conf[:css_compressor_options] || {})
+    @use_i18n               = conf[:use_i18n]
     set_javascript_compressor(conf[:javascript_compressor])
+    set_haml_engine(conf[:haml])
     set_package_assets(conf[:package_assets])
     set_template_function(conf[:template_function])
     set_template_namespace(conf[:template_namespace])
@@ -132,6 +134,11 @@ module Jammit
   end
 
   private
+
+  # Makes jammit generate templates from haml views
+  def self.set_haml_engine(value)
+    @haml = value || false
+  end
 
   # Ensure that the JavaScript compressor is a valid choice.
   def self.set_javascript_compressor(value)

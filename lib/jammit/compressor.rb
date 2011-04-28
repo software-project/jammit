@@ -1,5 +1,7 @@
 require "haml"
+require 'jammit/helper'
 module Jammit
+
 
   # Uses the YUI Compressor or Closure Compiler to compress JavaScript.
   # Always uses YUI to compress CSS (Which means that Java must be installed.)
@@ -111,16 +113,14 @@ module Jammit
     private
 
     def process_template(namespace, path, base_path)
+      contents  = read_binary_file(path)
+      name      = template_name(path, base_path)
       if Jammit.haml
-        engine = Haml::Engine.new(path, Jammit.haml)
-        name      = template_name(path, base_path)
-        "#{namespace}['#{name}'] = #{Jammit.template_function}('#{engine.render}');"
-      else
-        contents  = read_binary_file(path)
-        contents  = contents.gsub(/\r?\n/, "\\n").gsub("'", '\\\\\'')
-        name      = template_name(path, base_path)
-        "#{namespace}['#{name}'] = #{Jammit.template_function}('#{contents}');"
+        engine = Haml::Engine.new(contents, Jammit.haml)
+        contents = engine.render(TagHelper.instance)
       end
+      contents  = contents.gsub(/\r?\n/, "\\n").gsub("'", '\\\\\'')
+      "#{namespace}['#{name}'] = #{Jammit.template_function}('#{contents}');"
     end
 
     # Given a set of paths, find a common prefix path.
@@ -261,4 +261,18 @@ module Jammit
     end
   end
 
+end
+
+#Not pretty patch to load helpers to HAML
+class TagHelper
+  extend ActiveSupport::Autoload
+
+  include Singleton
+  include ActionView::Helpers::TagHelper
+  include ActionView::Helpers::AssetTagHelper
+  include Jammit::Helper
+
+  autoload_under "metal" do
+    autoload :Helpers
+  end
 end

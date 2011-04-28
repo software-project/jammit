@@ -37,6 +37,27 @@ module Jammit
       raise DeprecationError, "Jammit 0.5+ no longer supports separate packages for templates.\nYou can include your JST alongside your JS, and use include_javascripts."
     end
 
+    # Inserts tags for javascipt code. Tags are interpreted by JST templates
+    # Eg.
+    #   = insert_javascript("alert('hello world')")
+    # Generates:
+    #   <% alert('hello world') %>
+    def insert_javascript(javascript)
+      "<% #{javascript} %>"
+    end
+
+    alias_method :ij, :insert_javascript
+
+    # Inserts tags for javascipt code executions. Tags are interpreted by JST templates
+    # Eg.
+    #   = insert_javascript_execution("model.escape('title')")
+    # Generates:
+    #   <%= model.escape('title') %>
+    def insert_javascript_execution(javascript)
+      "<%= #{javascript} %>"
+    end
+
+    alias_method :ije, :insert_javascript_execution
 
     private
 
