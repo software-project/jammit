@@ -275,8 +275,7 @@ class TagHelper
   extend ActiveSupport::Autoload
 
   include Singleton
-  include ActionView::Helpers::TagHelper
-  include ActionView::Helpers::AssetTagHelper
+  include ActionView::Helpers
   include Jammit::Helper
 
   autoload_under "metal" do
