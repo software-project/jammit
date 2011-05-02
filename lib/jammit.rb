@@ -81,7 +81,7 @@ module Jammit
     @mhtml_enabled          = @embed_assets && @embed_assets != "datauri"
     @compressor_options     = symbolize_keys(conf[:compressor_options] || {})
     @css_compressor_options = symbolize_keys(conf[:css_compressor_options] || {})
-    @use_i18n               = conf[:use_i18n]
+    set_i18n(conf[:use_i18n])
     set_javascript_compressor(conf[:javascript_compressor])
     set_haml_engine(conf[:haml])
     set_package_assets(conf[:package_assets])
@@ -134,6 +134,41 @@ module Jammit
   end
 
   private
+
+  def self.set_i18n(prefix)
+    begin
+      Dir.mkdir("#{ASSET_ROOT}/public/javascripts/locales")
+    rescue Exception => e
+      puts "Couldn't create javascript locales dir: #{e}"
+    end
+    @use_i18n = prefix.class.name.to_s == "String" ? prefix : "jst"
+    dir = Dir.new("#{ASSET_ROOT}/config/locales")
+    dir.each{|file|
+      if (file =~ Regexp.new("jst")) == 0
+        lang = file.split(".")[1]
+        yml = YAML.load(ERB.new(File.read(dir.path + "/#{file}")).result)
+        File.open("#{ASSET_ROOT}/public/javascripts/locales/#{lang}.js", "w") do |f|
+          f.write("var dictionary_#{lang} = {\n")
+          @str = ""
+          yml[lang].each{|k,v|
+            write_locale(k, v)
+          }
+          f.write(@str.chop.chop)
+          f.write("}")
+        end
+      end
+    }
+  end
+
+  def self.write_locale(key,value)
+    if value.class.name.to_s == "String"
+      @str += "'#{key}':'#{value}',\n"
+    else
+      value.each{|k,v|
+        write_locale("#{key}.#{k}", v)
+      }
+    end
+  end
 
   # Makes jammit generate templates from haml views
   def self.set_haml_engine(value)

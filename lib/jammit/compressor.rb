@@ -74,6 +74,7 @@ module Jammit
       else
         js = concatenate(paths - jst_paths) + compile_jst(jst_paths)
       end
+#      js += "\n#{Jammit::ASSET_ROOT}/public/javascripts/locales/#{I18n.locale}.js" if Jammit.use_i18n
       Jammit.compress_assets ? @js_compressor.compress(js) : js
     end
 
@@ -111,6 +112,11 @@ module Jammit
 
 
     private
+
+    def get_locale
+      file_name = "#{Jammit.use_i18n}.#{I18n.locale}.yml"
+      path = "config/locales/#{Jammit.use_i18n}.#{I18n.locale}.yml"
+    end
 
     def process_template(namespace, path, base_path)
       contents  = read_binary_file(path)
@@ -265,6 +271,7 @@ end
 
 #Not pretty patch to load helpers to HAML
 class TagHelper
+  require 'jammit/haml_filter'
   extend ActiveSupport::Autoload
 
   include Singleton

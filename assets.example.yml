@@ -3,6 +3,10 @@ embed_assets:           on
 template_function:      _.template
 package_path:           packages
 javascript_compressor:  closure
+use_i18n: jst
+haml:
+  escape_html: false
+  ugly: true
 compressor_options:
   compilation_level: ADVANCED_OPTIMIZATIONS
 
