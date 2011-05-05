@@ -136,11 +136,7 @@ module Jammit
   private
 
   def self.set_i18n(prefix)
-    begin
-      Dir.mkdir("#{ASSET_ROOT}/public/javascripts/locales")
-    rescue Exception => e
-      puts "Couldn't create javascript locales dir: #{e}"
-    end
+    Dir.mkdir("#{ASSET_ROOT}/public/javascripts/locales") unless Dir.exist? "#{ASSET_ROOT}/public/javascripts/locales"
     @use_i18n = prefix.class.name.to_s == "String" ? prefix : "jst"
     dir = Dir.new("#{ASSET_ROOT}/config/locales")
     dir.each{|file|
