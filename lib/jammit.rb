@@ -144,13 +144,13 @@ module Jammit
         lang = file.split(".")[1]
         yml = YAML.load(ERB.new(File.read(dir.path + "/#{file}")).result)
         File.open("#{ASSET_ROOT}/public/javascripts/locales/#{lang}.js", "w") do |f|
-          f.write("var dictionary_#{lang} = {\n")
+          f.write("dictionary_#{lang} = {\n")
           @str = ""
           yml[lang].each{|k,v|
             write_locale(k, v)
           }
           f.write(@str.chop.chop)
-          f.write("}")
+          f.write("};")
         end
       end
     }
