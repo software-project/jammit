@@ -50,7 +50,7 @@ module Jammit
                   :embed_assets, :package_assets, :compress_assets, :gzip_assets,
                   :package_path, :mhtml_enabled, :include_jst_script, :config_path,
                   :javascript_compressor, :compressor_options, :css_compressor_options,
-                  :template_extension, :template_extension_matcher, :allow_debugging, :haml, :use_i18n
+                  :template_extension, :template_extension_matcher, :allow_debugging, :use_i18n
     attr_accessor :compressors
   end
 
@@ -83,7 +83,6 @@ module Jammit
     @css_compressor_options = symbolize_keys(conf[:css_compressor_options] || {})
     set_i18n(conf[:use_i18n])
     set_javascript_compressor(conf[:javascript_compressor])
-    set_haml_engine(conf[:haml])
     set_package_assets(conf[:package_assets])
     set_template_function(conf[:template_function])
     set_template_namespace(conf[:template_namespace])
@@ -164,11 +163,6 @@ module Jammit
         write_locale("#{key}.#{k}", v)
       }
     end
-  end
-
-  # Makes jammit generate templates from haml views
-  def self.set_haml_engine(value)
-    @haml = value || false
   end
 
   # Ensure that the JavaScript compressor is a valid choice.

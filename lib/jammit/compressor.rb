@@ -103,7 +103,10 @@ module Jammit
       paths       = paths.grep(Jammit.template_extension_matcher).sort
       base_path   = find_base_path(paths)
       compiled    = paths.map do |path|
-        process_template namespace, path, base_path
+        contents  = read_binary_file(path)
+        name      = template_name(path, base_path)
+        contents  = contents.gsub(/\r?\n/, "\\n").gsub("'", '\\\\\'')
+        "#{namespace}['#{name}'] = #{Jammit.template_function}('#{contents}');"
       end
       compiler = Jammit.include_jst_script ? read_binary_file(DEFAULT_JST_SCRIPT) : '';
       setup_namespace = "#{namespace} = #{namespace} || {};"
@@ -112,22 +115,6 @@ module Jammit
 
 
     private
-
-    def get_locale
-      file_name = "#{Jammit.use_i18n}.#{I18n.locale}.yml"
-      path = "config/locales/#{Jammit.use_i18n}.#{I18n.locale}.yml"
-    end
-
-    def process_template(namespace, path, base_path)
-      contents  = read_binary_file(path)
-      name      = template_name(path, base_path)
-      if Jammit.haml
-        engine = Haml::Engine.new(contents, Jammit.haml)
-        contents = engine.render(TagHelper.instance)
-      end
-      contents  = contents.gsub(/\r?\n/, "\\n").gsub("'", '\\\\\'')
-      "#{namespace}['#{name}'] = #{Jammit.template_function}('#{contents}');"
-    end
 
     # Given a set of paths, find a common prefix path.
     def find_base_path(paths)
@@ -267,18 +254,4 @@ module Jammit
     end
   end
 
-end
-
-#Not pretty patch to load helpers to HAML
-class TagHelper
-  require 'jammit/haml_filter'
-  extend ActiveSupport::Autoload
-
-  include Singleton
-  include ActionView::Helpers
-  include Jammit::Helper
-
-  autoload_under "metal" do
-    autoload :Helpers
-  end
 end
