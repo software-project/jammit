@@ -7,7 +7,7 @@ if defined?(Rails::Railtie)
       initializer :jammit_routes do |app|
         # Add a Jammit route for the reloader.
         app.routes_reloader.paths << File.join(File.dirname(__FILE__), "..", "..", "rails", "routes.rb")
-        ActionView::Base.send :include, Jammit::Helper
+        ActionView::Base::Helpers.send :include, Jammit::Helper
       end
 
     end
