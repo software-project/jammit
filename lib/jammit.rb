@@ -1,4 +1,5 @@
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__))
+require 'jammit/haml_filter'
 
 # @Jammit@ is the central namespace for all Jammit classes, and provides access
 # to all of the configuration options.
@@ -234,6 +235,10 @@ module Jammit
       hash[(key.to_sym rescue key) || key] = hash.delete(key)
     end
     hash
+  end
+
+  module Filters
+
   end
 
 end
