@@ -40,7 +40,7 @@ module Jammit
 
       def render(text)
         options = text.to_yaml
-        "<% #{options["collection"]}.each(function(#{options["item"] || "item"}) { %>"
+        "<% #{options["collection"] || "collection"}.each(function(#{options["item"] || "item"}) { %>"
       end
     end
 
