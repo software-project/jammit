@@ -111,9 +111,11 @@ module Haml::Filters
 # Example:
 # :js
 #   = model.get("value")
+#   = model.get("name")
 #
 # Produces:
 # <%= model.get("value") %>
+# <%= model.get("name") %>
 #
 # You can also use this tag to add other javascript constent, like:
 # :js
@@ -126,7 +128,11 @@ module Haml::Filters
     include Haml::Filters::Base
 
     def render(text)
-      "<%#{text.chop} %>"
+      js = ""
+      text.split("\n").each{|line|
+        js += "<%#{text} %>"
+      }
+      js
     end
   end
 end
