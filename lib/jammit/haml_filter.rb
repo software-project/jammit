@@ -70,7 +70,7 @@ module Jammit
       include Haml::Filters::Base
 
       def render(condition)
-        "<% if(#{condition}) { %>"
+        "<% if(#{condition.chop}) { %>"
       end
     end
 
@@ -88,7 +88,7 @@ module Jammit
       include Haml::Filters::Base
 
       def render(condition)
-        "<% } else if(#{condition}) { %>"
+        "<% } else if(#{condition.chop}) { %>"
       end
     end
 
