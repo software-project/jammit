@@ -131,7 +131,7 @@ module Jammit
       def render(text)
         js = ""
         text.split("\n").each{|line|
-          js += "<%#{text} %>"
+          js += "<%#{line} %>"
         }
         js
       end
