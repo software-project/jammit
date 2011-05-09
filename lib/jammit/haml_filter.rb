@@ -75,11 +75,22 @@ module Jammit
     end
 
     # Generates closing end tag for :if, :else and :elseif
+    # Work also for :each if provided each as text for filter
+    # Example:
+    # :end
+    #   each
+    # Produces:
+    # <% }); %>
     module End
       include Haml::Filters::Base
 
       def render(text)
-        "<% } %>"
+        case text
+          when "each"
+            "<% }); %>"
+          else
+            "<% } %>"
+        end
       end
     end
 
@@ -109,6 +120,7 @@ module Jammit
     end
 
     # Tag for inserting javascripts.
+    # Available tags: =, if, else, elseif, end, each, endeach
     # Example:
     # :js
     #   = model.get("value")
@@ -125,17 +137,74 @@ module Jammit
     # Produces:
     # <% if(condition){ %>
     #
+    # Other examples:
+    # :js
+    #   if condition
+    # equals
+    # :if
+    #   condition
+    #
+    # :js
+    #   else
+    # equals
+    # :else
+    #
+    # :js
+    #   each collection item
+    # equals
+    # :each
+    #   collection: collection
+    #   item: itemx
     module Js
       include Haml::Filters::Base
 
       def render(text)
         js = ""
         text.split("\n").each{|line|
-          js += "<%#{line} %>"
+          js += "<%#{get_tag(line)} %>"
         }
         js
       end
+
+      private
+      def get_tag(line)
+        case text
+          when /^=/
+            text
+          when /^if/
+            " if(#{text.gsub("if ","")}) {"
+          when /^elseif/
+            "<% } else if(#{text.gsub("elseif ","").chop}) {"
+          when /^else/
+            " } else {"
+          when /^endeach/
+            " });"
+          when /^end/
+            " }"
+          when /^each/
+            options = text.split(' ')
+            "#{options[1] || "collection"}.each(function(#{options[2] || "item"}) {"
+          else
+            text
+        end
+      end
+
     end
+
+## Generetes tags provided in filter text
+## Available tags: if, else, else
+#    module JsTag
+#      include Haml::Filters::Base
+#
+#      def render(text)
+#        js = ""
+#        text.split("\n").each{|line|
+#          js += "<%#{line} %>"
+#        }
+#        js
+#      end
+#
+#    end
   end
 end
 
