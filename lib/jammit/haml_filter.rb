@@ -168,13 +168,13 @@ module Jammit
 
       private
       def get_tag(line)
-        case text
+        case line
           when /^=/
-            text
+            line
           when /^if/
-            " if(#{text.gsub("if ","")}) {"
+            " if(#{line.gsub("if ","")}) {"
           when /^elseif/
-            "<% } else if(#{text.gsub("elseif ","").chop}) {"
+            "<% } else if(#{line.gsub("elseif ","").chop}) {"
           when /^else/
             " } else {"
           when /^endeach/
@@ -182,10 +182,10 @@ module Jammit
           when /^end/
             " }"
           when /^each/
-            options = text.split(' ')
+            options = line.split(' ')
             "#{options[1] || "collection"}.each(function(#{options[2] || "item"}) {"
           else
-            text
+            line
         end
       end
 
