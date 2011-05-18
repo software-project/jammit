@@ -2,6 +2,50 @@
 #require "yaml"
 
 module Jammit
+  class J
+
+    class << self
+
+      def link_to(text, url, options={})
+        "\"<a href=\'\" + #{get_url url} + \"\' #{options_for(options)} >\" + #{J.compile_text text} + \"</a>\""
+      end
+
+      def image_tag(source, options = {})
+        tag "img", options.merge({:src => "\" + #{source} + \""})
+      end
+
+      def tag(tag, options = {})
+        "\"<#{tag} #{options_for(options)} />\""
+      end
+
+      def options_for(options)
+        params = ""
+        options.each{|k,v|
+          params << " #{k}=\'#{v}\'"
+        }
+        params
+      end
+
+      def get_url(url)
+        case url
+          when /^#/
+            "\"#{url}\""
+          else
+            url
+        end
+      end
+
+      def compile_text(text)
+        begin
+          Kernel.eval text
+        rescue Exception => e
+          text
+        end
+      end
+    end
+
+  end
+
   module Filters
 
     # Allows to use :each that generates jst template for Underscore.js each loop
@@ -131,11 +175,6 @@ module Jammit
     # <%= model.get("name") %>
     #
     # You can also use this tag to add other javascript constent, like:
-    # :js
-    #   if(condition){
-    #
-    # Produces:
-    # <% if(condition){ %>
     #
     # Other examples:
     # :js
@@ -166,11 +205,15 @@ module Jammit
         js
       end
 
+      def compile_text(text)
+        J.compile_text text.strip
+      end
+
       private
       def get_tag(line)
         case line
           when /^=/
-            line
+            "= #{compile_text line[1..line.size]}"
           when /^if/
             " if(#{line.gsub("if ","")}) {"
           when /^elseif/
